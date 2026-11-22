@@ -123,3 +123,42 @@ def test_package_managers():
         s.commands.run("pip install --user six", timeout=180)
         assert s.commands.run("python3 -c 'import six; print(six.__version__)'").stdout.strip()
         assert s.commands.run("node -e \"require('/tmp/node_modules/express'); console.log('ok')\"").stdout.strip() == "ok"
+
+
+def test_pause_on_timeout_and_metadata():
+    """What agent frameworks use (OpenAI Agents SDK, Pydantic AI, Mastra): pause at the timeout instead of ending,
+    list by metadata and state, resume with connect."""
+    import time
+    import uuid
+    from e2b import SandboxQuery, SandboxState
+
+    tag = uuid.uuid4().hex[:8]
+    s = Sandbox.create("base", timeout=20, metadata={"compat": tag}, lifecycle={"on_timeout": "pause"})
+    try:
+        s.files.write("/tmp/mark", tag)
+        q = SandboxQuery(metadata={"compat": tag})
+        assert s.sandbox_id in [x.sandbox_id for x in Sandbox.list(query=q).next_items()]
+        time.sleep(45)
+        paused = SandboxQuery(metadata={"compat": tag}, state=[SandboxState.PAUSED])
+        assert s.sandbox_id in [x.sandbox_id for x in Sandbox.list(query=paused).next_items()]
+        assert Sandbox.connect(s.sandbox_id).files.read("/tmp/mark") == tag
+    finally:
+        Sandbox.kill(s.sandbox_id)
+
+
+def test_snapshot():
+    """A snapshot of a sandbox, and a new sandbox from it (OpenAI Agents SDK, TanStack AI, Vercel AI SDK)."""
+    with Sandbox.create("base", timeout=120) as s:
+        s.files.write("/tmp/snap", "kept")
+        sid = s.create_snapshot().snapshot_id
+    try:
+        with Sandbox.create(sid, timeout=60) as c:
+            assert c.files.read("/tmp/snap") == "kept"
+    finally:
+        Sandbox.delete_snapshot(sid)
+
+
+def test_no_internet():
+    with Sandbox.create("base", timeout=60, allow_internet_access=False) as s:
+        r = s.commands.run("curl -sS -m 5 -o /dev/null https://example.com || echo blocked")
+        assert "blocked" in r.stdout
