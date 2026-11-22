@@ -1,6 +1,6 @@
 # The daily compatibility run: both test suites against LumiBox production.
 FROM node:24.21.0-trixie-slim
-RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-venv ca-certificates \
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-venv ca-certificates libatomic1 \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY python/requirements.txt python/

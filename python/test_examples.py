@@ -114,3 +114,12 @@ def test_desktop():
         assert d.stream.get_url().startswith("https://")
     finally:
         d.kill()
+
+
+def test_package_managers():
+    """npm and pip in the base template install from their registries (whatever the template points them at)."""
+    with Sandbox.create("base", timeout=300) as s:
+        s.commands.run("cd /tmp && npm install --no-audit --no-fund express", timeout=180)
+        s.commands.run("pip install --user six", timeout=180)
+        assert s.commands.run("python3 -c 'import six; print(six.__version__)'").stdout.strip()
+        assert s.commands.run("node -e \"require('/tmp/node_modules/express'); console.log('ok')\"").stdout.strip() == "ok"
