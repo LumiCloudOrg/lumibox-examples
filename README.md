@@ -57,7 +57,7 @@ cd js && npm test
 
 ## Notes
 
-- One region: Singapore. Prices are in Singapore dollars, charged by the second from a prepaid balance: [pricing](https://lumicloud.ai/#pricing).
+- One region: Singapore. Prices are in US dollars, charged by the second from a prepaid balance: [pricing](https://lumicloud.ai/#pricing).
 - LumiBox is a service of LUMI CLOUD PTE. LTD. and is not affiliated with E2B. E2B's SDKs are used under their Apache-2.0 license.
 
 ## License

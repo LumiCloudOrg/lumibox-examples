@@ -57,7 +57,7 @@ cd js && npm test
 
 ## 说明
 
-- 单一地区：新加坡。价格以新加坡元计，从预付余额按秒扣费：[价格](https://lumicloud.ai/#pricing)。
+- 单一地区：新加坡。价格以美元计，从预付余额按秒扣费：[价格](https://lumicloud.ai/#pricing)。
 - LumiBox 由 LUMI CLOUD PTE. LTD. 提供，与 E2B 公司无关。E2B SDK 依其 Apache-2.0 许可使用。
 
 ## 许可
